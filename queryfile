@@ -1,0 +1,115 @@
+Create database employeemng;
+use employeemng;
+
+CREATE TABLE `employeemng`.`department` (
+  `Id` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(100) NOT NULL,
+  `IsActive` BIT(1) NOT NULL,
+  `IsDeleted` BIT(1) NOT NULL,
+  `CreatedOn` DATETIME NOT NULL,
+  `CreatedBy` INT NOT NULL,
+  `ModifiedOn` DATETIME NULL,
+  `ModifiedBy` INT NULL,
+  PRIMARY KEY (`Id`));
+
+
+CREATE TABLE `employeemng`.`userrole` (
+  `Roleid` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`Roleid`));
+
+CREATE TABLE `employeemng`.`employee` (
+  `Id` INT NOT NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `DOB` VARCHAR(45) NOT NULL,
+  `Qualification` VARCHAR(45) NOT NULL,
+  `Address` VARCHAR(225) NOT NULL,
+  `EmpDeptId` INT NOT NULL,
+  `RoleId` INT NOT NULL,
+  `IsActive` BIT(1) NOT NULL,
+  `IsDeleted` BIT(1) NOT NULL,
+  `CreatedOn` DATETIME NOT NULL,
+  `CreatedBy` INT NOT NULL,
+  `ModifiedOn` DATETIME NULL,
+  `ModifiedBy` INT NULL,
+  PRIMARY KEY (`Id`),
+  INDEX `fk_EmpDeptId_employee_department_idx` (`EmpDeptId` ASC) VISIBLE,
+  INDEX `fk_RoleId-employee-userrole_idx` (`RoleId` ASC) VISIBLE,
+  CONSTRAINT `fk_EmpDeptId_employee_department`
+    FOREIGN KEY (`EmpDeptId`)
+    REFERENCES `employeemng`.`department` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_RoleId-employee-userrole`
+    FOREIGN KEY (`RoleId`)
+    REFERENCES `employeemng`.`userrole` (`Roleid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+
+
+CREATE TABLE `employeemng`.`masterleavetype` (
+  `Id` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Id`));
+
+
+
+
+
+CREATE TABLE `employeemng`.`employeeleaverequest` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `EmpId` INT NOT NULL,
+  `LeaveTyepId` INT NOT NULL,
+  `From` DATETIME NOT NULL,
+  `To` DATETIME NOT NULL,
+  `Remarks` VARCHAR(105) NOT NULL,
+  `CreatedOn` DATETIME NOT NULL,
+  `CreatedBy` INT NOT NULL,
+  `ModifiedOn` DATETIME NULL,
+  `ModifiedBy` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_EmpId_employeeleave_employee_idx` (`EmpId` ASC) VISIBLE,
+  INDEX `fk_leavetypeId_employeeleavereq_MasterLevty_idx` (`LeaveTyepId` ASC) VISIBLE,
+  CONSTRAINT `fk_EmpId_employeeleave_employee`
+    FOREIGN KEY (`EmpId`)
+    REFERENCES `employeemng`.`employee` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_leavetypeId_employeeleavereq_MasterLevty`
+    FOREIGN KEY (`LeaveTyepId`)
+    REFERENCES `employeemng`.`masterleavetype` (`Id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+
+    
+    CREATE TABLE `employeemng`.`employeeattendence` (
+  `Id` INT NOT NULL AUTO_INCREMENT,
+  `EmployeeId` INT NOT NULL,
+  `AttDate` DATETIME NOT NULL,
+  `InTime` TIME NOT NULL,
+  `OutTime` TIME NOT NULL,
+  `WorkHours` DECIMAL NULL,
+  `Status` VARCHAR(45) NOT NULL,
+  `IsHalfDay` BIT(1) NOT NULL DEFAULT false,
+  `IsOverTime` BIT(1) NOT NULL DEFAULT false,
+  `OvertimeHours` DECIMAL NULL,
+  `Shift` VARCHAR(45) NOT NULL,
+  `CreatedOn` DATETIME NOT NULL,
+  `ModifiedOn` DATETIME NULL,
+  PRIMARY KEY (`Id`));
+  
+  ALTER TABLE `employeemng`.`employeeattendence` 
+CHANGE COLUMN `WorkHours` `WorkHours` DECIMAL(5,2) NULL DEFAULT NULL ,
+CHANGE COLUMN `OvertimeHours` `OvertimeHours` DECIMAL(5,2) NULL DEFAULT NULL ,
+ADD INDEX `fk_Empld_employeeattendence_emp_idx` (`EmployeeId` ASC) VISIBLE;
+;
+ALTER TABLE `employeemng`.`employeeattendence` 
+ADD CONSTRAINT `fk_Empld_employeeattendence_emp`
+  FOREIGN KEY (`EmployeeId`)
+  REFERENCES `employeemng`.`employee` (`Id`)
+  ON DELETE RESTRICT
+  ON UPDATE RESTRICT;
